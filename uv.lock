@@ -152,7 +152,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.31,<3" },
     { name = "ruamel-yaml", specifier = ">=0.18.0,<0.20" },
     { name = "slack-bolt", specifier = ">=1.30.0,<2" },
-    { name = "starlette", specifier = ">=0.49.1,<1" },
+    { name = "starlette", specifier = ">=0.49.1,<2" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.52.1,<1.0" },
     { name = "websocket-client", specifier = ">=1.8,<2" },
     { name = "websockets", specifier = ">=12.0,<16" },
@@ -4974,15 +4974,15 @@ wheels = [
 
 [[package]]
 name = "starlette"
-version = "0.52.1"
+version = "1.10.0"
 source = { registry = "https://repo.huaweicloud.com/repository/pypi/simple" }
 dependencies = [
     { name = "anyio" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
-sdist = { url = "https://repo.huaweicloud.com/repository/pypi/packages/c4/68/79977123bb7be889ad680d79a40f339082c1978b5cfcf62c2d8d196873ac/starlette-0.52.1.tar.gz", hash = "sha256:834edd1b0a23167694292e94f597773bc3f89f362be6effee198165a35d62933" }
+sdist = { url = "https://repo.huaweicloud.com/repository/pypi/packages/48/bb/3d8757f21e9a53d9035c9eb039a777047139a16bfdbedfc7a58241c3d914/starlette-1.10.0.tar.gz", hash = "sha256:b8399098d4c1e3522734f7235dc79b1fc967f96cf139c81e0fa30479e0685f9b" }
 wheels = [
-    { url = "https://repo.huaweicloud.com/repository/pypi/packages/81/0d/13d1d239a25cbfb19e740db83143e95c772a1fe10202dda4b76792b114dd/starlette-0.52.1-py3-none-any.whl", hash = "sha256:0029d43eb3d273bc4f83a08720b4912ea4b071087a3b48db01b7c839f7954d74" },
+    { url = "https://repo.huaweicloud.com/repository/pypi/packages/88/2e/947cfe02def9371c07cd5bf5b6b61c829e9aecb9904db02a66cfafbc1eec/starlette-1.10.0-py3-none-any.whl", hash = "sha256:478c0ab3b4ced6e82719849c118fa406f0278a3499c1a898cd15cd31bdc38ce4" },
 ]
 
 [[package]]
