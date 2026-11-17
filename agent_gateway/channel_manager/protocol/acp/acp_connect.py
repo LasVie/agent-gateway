@@ -49,6 +49,7 @@ parse_dotenv_early("agent-gateway-acp")
 # --- Now safe to import jiuwenswarm modules ---
 from agent_gateway.channel_manager.base import BaseChannel, RobotMessageRouter
 from agent_gateway.common.version import get_runtime_version
+from agent_gateway.common.request_method import parse_request_method
 from agent_gateway.routing.keys import DeliveryTarget
 from agent_gateway.routing.session_sharing import RoutingTarget
 
@@ -897,7 +898,7 @@ class AcpChannel(BaseChannel):
             or self.config.default_session_id
         )
 
-        req_method = self._parse_req_method(method)
+        req_method = parse_request_method(method)
         if method == "session/prompt":
             text = self._extract_prompt_text(params)
             params.setdefault("content", text)
@@ -1558,13 +1559,6 @@ class AcpChannel(BaseChannel):
             if isinstance(value, str) and value.strip():
                 return value.strip()
         return ""
-
-    @staticmethod
-    def _parse_req_method(method: str) -> ReqMethod | None:
-        for item in ReqMethod:
-            if item.value == method:
-                return item
-        return None
 
     @staticmethod
     def _provenance(kind: str) -> E2AProvenance:
