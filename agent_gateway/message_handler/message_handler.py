@@ -73,7 +73,6 @@ from agent_gateway.message_handler.evolution_approval import (
     EvolutionApprovalCoordinator,
     ensure_regular_evolution_approval_metadata,
     is_evolution_approval_payload,
-    is_evolution_approval_request_id,
     is_interrupt_evolution_approval_answer_payload,
 )
 from agent_gateway.message_handler.join_exit_handlers import JoinExitHandlers
@@ -4908,10 +4907,6 @@ class MessageHandler(ABC):
             msg.session_id,
             sorted(changed),
         )
-
-    @staticmethod
-    def _is_evolution_approval_request_id(request_id: Any) -> bool:
-        return is_evolution_approval_request_id(request_id)
 
     @staticmethod
     def _is_evolution_approval_payload(payload: Any) -> bool:
