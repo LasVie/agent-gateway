@@ -65,3 +65,46 @@ def test_gateway_base_drops_pr2_b2_safe_keys() -> None:
         "setup_guide", "auto_recap", "a4p", "kv_cache_affinity_config",
     }
     assert b2_safe.isdisjoint(BASE)
+
+
+def test_gateway_templates_drop_auto_memory_enabled() -> None:
+    assert "auto_memory_enabled" not in BASE
+    assert "auto_memory_enabled" not in AGENTOS
+
+
+def test_gateway_template_drops_evolution_auto_save() -> None:
+    evolution = BASE["react"]["evolution"]
+    assert "auto_save" not in evolution
+    assert "skill_evolution" not in evolution
+
+
+def test_gateway_template_drops_context_engine_enabled() -> None:
+    assert "enabled" not in BASE["react"]["context_engine_config"]
+
+
+def test_gateway_templates_drop_preferred_language() -> None:
+    assert "preferred_language" not in BASE
+    assert "preferred_language" not in AGENTOS
+
+
+def test_gateway_templates_drop_mcp_and_heartbeat() -> None:
+    for key in ("mcp", "heartbeat"):
+        assert key not in BASE
+        assert key not in AGENTOS
+
+
+def test_gateway_templates_drop_enterprise_confirmed_flags() -> None:
+    for key in (
+        "a2ui",
+        "symphony",
+        "rsi",
+        "trajectory_ui",
+        "experimental",
+        "recommendation",
+    ):
+        assert key not in BASE
+        assert key not in AGENTOS
+
+
+def test_gateway_template_drops_permissions() -> None:
+    assert "permissions" not in BASE
