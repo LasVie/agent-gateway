@@ -2409,6 +2409,15 @@ async def _run(
         config={},
         logger=logger,
     )
+    from agent_gateway.agent_client_mode import (
+        ROUTER_CLIENT_TYPES,
+        read_agent_client_mode,
+        resolve_agent_server_client,
+        validate_agent_client_configuration,
+    )
+
+    agent_client_mode = read_agent_client_mode()
+    validate_agent_client_configuration(get_config() or {}, mode=agent_client_mode)
     extension_manager = ExtensionManager(registry=extension_registry)
     log_startup_stage("extension_manager_created")
     await extension_manager.load_all_extensions()
@@ -2456,11 +2465,15 @@ async def _run(
     if using_adx_router:
         if agent_server_ext is None or agent_server_ext.metadata.id != "adx_router":
             raise RuntimeError("Selected adx_router extension failed to load; check gateway.adx configuration")
+    client = resolve_agent_server_client(
+        agent_server_ext,
+        mode=agent_client_mode,
+        websocket_factory=lambda: WebSocketAgentServerClient(
+            ping_interval=20.0, ping_timeout=600.0,
+        ),
+    )
     if agent_server_ext is not None:
         logger.info("[App] using extension AgentServerClient: %s", agent_server_ext.metadata.name)
-        client = agent_server_ext.get_client()
-    else:
-        client = WebSocketAgentServerClient(ping_interval=20.0, ping_timeout=600.0)
 
     from agent_gateway.routing.third_agent import get_unsupported_third_agent
 
@@ -3845,7 +3858,7 @@ async def _run(
                 )
                 if not enabled:
                     logger.info("[App] channels.ssh.%s, SshChannel disabled", reason)
-                elif client_type not in {"agentos_router", "adx_router"}:
+                elif client_type not in ROUTER_CLIENT_TYPES:
                     logger.warning(
                         "[App] channels.ssh.enabled=true but gateway.agent_client.type=%s "
                         "(require agentos_router or adx_router); SshChannel will not start",
