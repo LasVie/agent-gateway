@@ -462,7 +462,8 @@ _JIUWENMATE_FORWARD_METHODS = frozenset({
     "jiuwenmate.welink_office.status",
 })
 
-# 仅转发到 Agent 的 Web method
+# 强制转发到 AgentServer 的 Web method。本地已注册同名 handler 时仍以转发为准；
+# 未登记的方法按“本地白名单 + 默认透传”处理，新增方法无需改动网关。
 _FORWARD_REQ_METHODS = frozenset({
     *_JIUWENMATE_FORWARD_METHODS,
     'group.create',
@@ -2286,11 +2287,11 @@ def _register_web_handlers(bind: WebHandlersBindParams) -> None:
                 "protocol_version": "1.0",
             },
         )
-        mh = _resolve(message_handler)
-        if mh:
-            await mh.publish_robot_messages(ack_msg)
-        else:
-            await channel.send(ack_msg)
+        # connection.ack 必须是握手首帧（前端与 ST 契约）。不能经
+        # robot_messages 队列异步派发：扩展在连接钩子里直接向 ws 写
+        # client.declarations，队列中的 ack 会晚于声明到达。channel.send
+        # 直接入本连接的发送队列，保证 ack 先于后续连接钩子产生的帧。
+        await channel.send(ack_msg)
 
     channel.on_connect(_on_connect)
 
@@ -2304,6 +2305,17 @@ def _register_web_handlers(bind: WebHandlersBindParams) -> None:
     register_disconnect = getattr(channel, "on_disconnect", None)
     if callable(register_disconnect):
         register_disconnect(_on_disconnect)
+
+    # WebUI 扩展上行协议与扩展包管理协议统一注册在这里：前者转发给
+    # AgentServer 并合并 Gateway 域扩展的设置声明，后者先判归属、只处理
+    # Gateway 域包，其余继续交给 AgentServer。
+    from agent_gateway.channel_manager.web.extension_package_handlers import (
+        register_extension_package_handlers,
+    )
+    from agent_gateway.channel_manager.web.webui_handlers import register_webui_handlers
+
+    register_webui_handlers(channel, lambda: _resolve(agent_client))
+    register_extension_package_handlers(channel, lambda: _resolve(agent_client))
 
     async def _config_get(ws, req_id, params, session_id):
         """Serve the local enterprise config view through the Gateway."""
