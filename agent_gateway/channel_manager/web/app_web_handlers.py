@@ -485,6 +485,7 @@ _FORWARD_REQ_METHODS = frozenset({
 
     "initialize",
     "session.switch",
+    "session.input.intent",
     "session.fork",
     "mode.set",
     "mode.get",
@@ -740,6 +741,7 @@ _FORWARD_NO_LOCAL_HANDLER_METHODS = frozenset({
 
     "initialize",
     "session.switch",
+    "session.input.intent",
     "session.fork",
     "mode.set",
     "mode.get",
