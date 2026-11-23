@@ -25,6 +25,8 @@ from contextlib import nullcontext
 from dataclasses import dataclass, field
 from typing import Any, Mapping, TypedDict
 
+from agent_gateway.common.retry import jittered_delay
+
 TRACE_ID_HEADER = "X-Trace-Id"
 AGENT_GENERATION_ENV = "JIUWEN_GATEWAY_SANDBOX_GENERATION"
 _TRACE_ID_MAX_LEN = 128
@@ -891,6 +893,7 @@ class YuanrongFrontendAgentClient:
                 if remaining <= 0:
                     raise_wait_timeout()
                 sleep_for = min(interval_s, remaining)
+                delay = min(jittered_delay(sleep_for), max(0.0, remaining))
                 logger.debug(
                     "[YuanrongFrontendAgentClient] GET not running yet: "
                     "instance_id=%s attempt=%s status=%s sleep=%.1fs last_error=%s "
@@ -898,11 +901,11 @@ class YuanrongFrontendAgentClient:
                     normalized_id,
                     attempt,
                     status or "empty",
-                    sleep_for,
+                    delay,
                     type(last_error).__name__ if last_error is not None else "-",
                     poll_trace_id,
                 )
-                await asyncio.sleep(sleep_for)
+                await asyncio.sleep(delay)
 
     async def upload_agent_file(
         self,
